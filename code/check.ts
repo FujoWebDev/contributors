@@ -38,7 +38,7 @@ function formatValidationError(error: any, filePath: string): string {
   return error.message;
 }
 
-function validateTeamFile(filePath: string): ValidationResult {
+async function validateTeamFile(filePath: string): Promise<ValidationResult> {
   const result: ValidationResult = {
     file: filePath,
     isValid: false,
@@ -50,7 +50,7 @@ function validateTeamFile(filePath: string): ValidationResult {
     const content = readFileSync(filePath, "utf-8");
     const data = parse(content);
 
-    const validation = TeamContributor.safeParse(data);
+    const validation = await TeamContributor.safeParseAsync(data);
     if (validation.success) {
       result.isValid = true;
     } else {
@@ -69,8 +69,8 @@ function validateTeamFile(filePath: string): ValidationResult {
   return result;
 }
 
-function validateAllTeamFiles(): ValidationResult[] {
-  const results: ValidationResult[] = [];
+function validateAllTeamFiles() {
+  const results: Promise<ValidationResult>[] = [];
 
   try {
     const files = readdirSync(TEAM_DIR)
@@ -133,12 +133,18 @@ function printResults(results: ValidationResult[]): void {
   }
 }
 
-function runValidation(isWatchMode: boolean = false): void {
-  const results = validateAllTeamFiles();
-  printResults(results);
+async function runValidation(isWatchMode: boolean = false) {
+  console.clear();
+  console.log("Running validation...");
+  // Needs to wait or it's not clear anything is happening
+  await sleep(200);
+  const results = await Promise.all(await validateAllTeamFiles());
+  const hasErrors = results.some((r) => !r.isValid);
+  printResults(await Promise.all(results));
   if (isWatchMode) {
     console.log("Waiting for more changes...");
   }
+  return hasErrors;
 }
 
 function startWatchMode(): void {
@@ -151,7 +157,7 @@ function startWatchMode(): void {
 
   const teamWatcher = watch(
     TEAM_DIR,
-    { recursive: false },
+    { recursive: true },
     (eventType, filename) => {
       console.log(`${eventType}: ${filename}`);
       if (
@@ -194,10 +200,10 @@ const isWatchMode =
 if (isWatchMode) {
   startWatchMode();
 } else {
-  runValidation();
+  const hasErrors = await runValidation();
 
-  // Exit with error code if validation failed
-  const results = validateAllTeamFiles();
-  const hasErrors = results.some((r) => !r.isValid);
   process.exit(hasErrors ? 1 : 0);
+}
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

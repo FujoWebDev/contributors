@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PROJECT_ROLES, PROJECTS } from "./data/projects";
+import { access } from "node:fs/promises";
 import {
   SocialsSchema,
   transformSocial,
@@ -33,7 +34,17 @@ const Roles = z.object(
 
 export const TeamContributor = z.object({
   name: z.string(),
-  avatar: z.string(),
+  avatar: z.string().superRefine((path, ctx) =>
+    access(path).catch(() => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `no avatar file found at ${path}`,
+        path: ["avatar"],
+      });
+    })
+  ),
   roles: Roles,
-  contacts: SocialsSchema.array().default([]),
+  contacts: SocialsSchema.array()
+    .default([])
+    .transform((contacts) => contacts.map(transformSocial)),
 });
