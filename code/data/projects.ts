@@ -4,6 +4,7 @@ export const PROJECTS = [
   // TODO: rename to "FujoWebDev Website"
   "Website",
   "Volume 0 Issue 1",
+  "Fandom Cookies",
 ];
 
 export const VOLUME_0_ISSUE_1_ROLES = [

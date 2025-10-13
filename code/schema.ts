@@ -20,7 +20,13 @@ const Roles = z.object(
   Object.fromEntries(
     PROJECTS.map((project) => [
       project,
-      Role(PROJECT_ROLES[project]).array().default([]),
+      Role(
+        PROJECT_ROLES[project]
+          ? z.enum(PROJECT_ROLES[project] as [string, ...string[]])
+          : z.string()
+      )
+        .array()
+        .default([]),
     ])
   )
 );
@@ -29,7 +35,5 @@ export const TeamContributor = z.object({
   name: z.string(),
   avatar: z.string(),
   roles: Roles,
-  contacts: SocialsSchema.array()
-    .default([])
-    .transform((contacts) => contacts.map(transformSocial)),
+  contacts: SocialsSchema.array().default([]),
 });
