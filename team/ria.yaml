@@ -1,2 +1,8 @@
 name: ria
-avatar: ./avatars/riazaia.png
+avatar: "./avatars/riazaia.png"
+roles:
+  Fandom Cookies:
+    - General Coding
+    - Digital Item Pack Assembly
+contacts:
+  - https://github.com/riazaia
