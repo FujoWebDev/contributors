@@ -5,6 +5,7 @@ import {
   SocialsSchema,
   transformSocial,
 } from "@fujocoded/zod-transform-socials";
+import path from "node:path";
 
 const Role = <T extends z.ZodEnum<any> | z.ZodString = z.ZodString>(
   roleType: T | z.ZodString = z.string()
@@ -17,32 +18,26 @@ const Role = <T extends z.ZodEnum<any> | z.ZodString = z.ZodString>(
     }),
   ]);
 
-const Roles = z.object(
-  Object.fromEntries(
-    PROJECTS.map((project) => [
-      project,
-      Role(
-        PROJECT_ROLES[project]
-          ? z.enum(PROJECT_ROLES[project] as [string, ...string[]])
-          : z.string()
-      )
-        .array()
-        .default([]),
-    ])
+const Roles = z
+  .object(
+    Object.fromEntries(
+      PROJECTS.map((project) => [
+        project,
+        Role(
+          PROJECT_ROLES[project]
+            ? z.enum(PROJECT_ROLES[project] as [string, ...string[]])
+            : z.string()
+        )
+          .array()
+          .default([]),
+      ])
+    )
   )
-);
+  .strict();
 
 export const TeamContributor = z.object({
   name: z.string(),
-  avatar: z.string().superRefine((path, ctx) =>
-    access(path).catch(() => {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `no avatar file found at ${path}`,
-        path: ["avatar"],
-      });
-    })
-  ),
+  avatar: z.string(),
   roles: Roles,
   contacts: SocialsSchema.array()
     .default([])

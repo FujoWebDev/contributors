@@ -1,13 +1,17 @@
 import { readFileSync, readdirSync, watch } from "node:fs";
+import { access } from "node:fs/promises";
 import path from "node:path";
 
 import { parse } from "yaml";
 
 import { TeamContributor } from "./schema.js";
-import { PROJECTS } from "./data/projects.js";
+import z from "zod";
 
 const TEAM_DIR = path.resolve(process.cwd(), "team");
 const PROJECTS_FILE = path.resolve(process.cwd(), "code/data/projects.ts");
+
+// Global abort controller to manage running validations
+let currentValidationController: AbortController | null = null;
 interface ValidationResult {
   file: string;
   isValid: boolean;
@@ -17,11 +21,32 @@ interface ValidationResult {
 
 class InvalidRoleError extends Error {
   constructor(projectName: string, filePath: string) {
-    super(`Invalid role in project "${projectName}" for file ${filePath}.`);
+    super(
+      `Invalid role in project "${projectName}" for file ./${path.relative(
+        process.cwd(),
+        filePath
+      )}.`
+    );
+  }
+}
+class InvalidProjectError extends Error {
+  constructor(projectName: string, filePath: string) {
+    super(
+      `Invalid project "${projectName}" for file ./${path.relative(
+        process.cwd(),
+        filePath
+      )}.`
+    );
   }
 }
 
 function formatValidationError(error: any, filePath: string): string {
+  if (error.code === "unrecognized_keys") {
+    if (error.path.length === 1 && error.path[0].includes("roles")) {
+      const projectName = error.keys[0];
+      throw new InvalidProjectError(projectName, filePath);
+    }
+  }
   if (error.code === "invalid_union") {
     // Handle role validation errors more clearly
     const path = error.path.join(".");
@@ -38,7 +63,10 @@ function formatValidationError(error: any, filePath: string): string {
   return error.message;
 }
 
-async function validateTeamFile(filePath: string): Promise<ValidationResult> {
+async function validateTeamFile(
+  filePath: string,
+  signal?: AbortSignal
+): Promise<ValidationResult> {
   const result: ValidationResult = {
     file: filePath,
     isValid: false,
@@ -47,10 +75,31 @@ async function validateTeamFile(filePath: string): Promise<ValidationResult> {
   };
 
   try {
+    signal?.throwIfAborted();
+
     const content = readFileSync(filePath, "utf-8");
     const data = parse(content);
 
-    const validation = await TeamContributor.safeParseAsync(data);
+    const validation = await TeamContributor.superRefine(
+      async (contributor, ctx) => {
+        const avatarPath = path.resolve(
+          path.dirname(filePath),
+          contributor.avatar
+        );
+        try {
+          await access(avatarPath);
+        } catch {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `No avatar file found at ./${path.relative(
+              process.cwd(),
+              avatarPath
+            )}`,
+            path: ["avatar"],
+          });
+        }
+      }
+    ).safeParseAsync(data);
     if (validation.success) {
       result.isValid = true;
     } else {
@@ -59,6 +108,9 @@ async function validateTeamFile(filePath: string): Promise<ValidationResult> {
       );
     }
   } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw error;
+    }
     result.errors.push(
       `Failed to parse file: ${
         error instanceof Error ? error.message : String(error)
@@ -69,7 +121,7 @@ async function validateTeamFile(filePath: string): Promise<ValidationResult> {
   return result;
 }
 
-function validateAllTeamFiles() {
+function validateAllTeamFiles(signal?: AbortSignal) {
   const results: Promise<ValidationResult>[] = [];
 
   try {
@@ -78,7 +130,7 @@ function validateAllTeamFiles() {
       .map((file) => path.join(TEAM_DIR, file));
 
     for (const file of files) {
-      results.push(validateTeamFile(file));
+      results.push(validateTeamFile(file, signal));
     }
   } catch (error) {
     console.error(
@@ -134,17 +186,38 @@ function printResults(results: ValidationResult[]): void {
 }
 
 async function runValidation(isWatchMode: boolean = false) {
-  console.clear();
-  console.log("Running validation...");
-  // Needs to wait or it's not clear anything is happening
-  await sleep(200);
-  const results = await Promise.all(await validateAllTeamFiles());
-  const hasErrors = results.some((r) => !r.isValid);
-  printResults(await Promise.all(results));
-  if (isWatchMode) {
-    console.log("Waiting for more changes...");
+  // Cancel any existing validation
+  currentValidationController?.abort();
+
+  // Create new abort controller for this validation
+  currentValidationController = new AbortController();
+  const signal = currentValidationController.signal;
+
+  try {
+    console.clear();
+    console.log("Running validation...");
+
+    // Needs to wait or it's not clear anything is happening
+    await sleep(200);
+
+    const results = await Promise.all(await validateAllTeamFiles(signal));
+    const hasErrors = results.some((r) => !r.isValid);
+
+    printResults(await Promise.all(results));
+    if (isWatchMode) {
+      console.log("Waiting for more changes...");
+    }
+    return hasErrors;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      return false;
+    }
+    throw error;
+  } finally {
+    if (currentValidationController?.signal === signal) {
+      currentValidationController = null;
+    }
   }
-  return hasErrors;
 }
 
 function startWatchMode(): void {
