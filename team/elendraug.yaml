@@ -3,7 +3,8 @@ avatar: "./avatars/elendraug.png"
 type: community
 roles:
   Fandom Cookies:
-    - Alt Text
+    - role: Extra 
+      details: Alt Text
     - Digital Item Pack Assembly
     - Additional Research, Feedback, Development, and Assistance
 contacts:

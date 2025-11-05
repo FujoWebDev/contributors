@@ -1,8 +1,9 @@
 name: kat
 avatar: ./avatars/kat.jpg
+type: contractor
 roles:
   FujoCoded:
-    - HimeOps
+  - HimeOps
 contacts:
   - https://bsky.app/profile/katproto.girlonthemoon.xyz
   - https://github.com/xxwhirlpool/
