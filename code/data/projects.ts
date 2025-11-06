@@ -38,10 +38,14 @@ export const FUJOCODED_ROLES = [
 export const FANDOM_COOKIES_ROLES = [
   "Artist",
   "Extra",
+  "Alt Text",
   "Programming",
   "Digital Item Pack Assembly",
   "Additional Research, Feedback, Development, and Assistance",
-  "Digital Item Pack Wallpapers"
+  "Digital Item Pack Wallpapers",
+  "Extra Hands (and Brains)",
+  "CSS & Design",
+  "Art Direction",
 ];
 
 export const TEST_PROJECTNAME_ROLES = [
