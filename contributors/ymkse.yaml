@@ -1,5 +1,8 @@
 name: ymkse
 avatar: "./avatars/ymkse.jpg"
+type: 
+  - community
+  - contractor
 roles:
   Fandom Cookies:
     - role: Artist

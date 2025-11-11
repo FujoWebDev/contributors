@@ -33,15 +33,11 @@ const Roles = z
     )
   )
   .strict();
-
-
-const contributorType =  z.enum(
-  ["founder", "contractor", "community"]).array().default(["community"]);
-
+  
 export const ContributorSchema = ({ image } : SchemaContext) => z.object({
   name: z.string(),
   avatar: image(),
-  type: contributorType,
+  type: z.enum(["founder", "contractor", "community"]).array(),
   roles: Roles,
   contacts: SocialsSchema.array()
     .default([])
