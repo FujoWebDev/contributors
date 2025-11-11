@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { parse } from "yaml";
 
-import { Contributor as ContributorFunction } from "../contributors/_schema";
+import { ContributorSchema as ContributorFunction } from "../contributors/_schema";
 import z from "zod";
 
 const TEAM_DIR = path.resolve(process.cwd(), "contributors");
