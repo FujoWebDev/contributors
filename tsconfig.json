@@ -1,0 +1,6 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "types": ["./node_modules/astro/types/content.d.ts"]
+  }
+}

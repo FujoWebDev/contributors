@@ -1,11 +1,10 @@
 import { z } from "zod";
 import { PROJECT_ROLES, PROJECTS } from "./projects";
-import { access } from "node:fs/promises";
 import {
   SocialsSchema,
   transformSocial,
 } from "@fujocoded/zod-transform-socials";
-import path from "node:path";
+import type { SchemaContext } from "astro:content";
 
 const Role = <T extends z.ZodEnum<any> | z.ZodString = z.ZodString>(
   roleType: T | z.ZodString = z.string()
@@ -35,9 +34,9 @@ const Roles = z
   )
   .strict();
 
-export const TeamContributor = z.object({
+export const TeamContributor = ({ image } : SchemaContext) => z.object({
   name: z.string(),
-  avatar: z.string(),
+  avatar: image(),
   roles: Roles,
   contacts: SocialsSchema.array()
     .default([])

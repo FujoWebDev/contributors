@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { parse } from "yaml";
 
-import { TeamContributor } from "../team/_schema";
+import { TeamContributor as TeamContributorFunction } from "../team/_schema";
 import z from "zod";
 
 const TEAM_DIR = path.resolve(process.cwd(), "team");
@@ -30,6 +30,7 @@ class InvalidRoleError extends Error {
     );
   }
 }
+
 class InvalidProjectError extends Error {
   constructor(projectName: string, filePath: string) {
     super(
@@ -40,6 +41,9 @@ class InvalidProjectError extends Error {
     );
   }
 }
+
+// @ts-expect-error This is fucked up because it's type of image in Astro
+const TeamContributor = TeamContributorFunction({ image: z.string})
 
 function formatValidationError(error: any, filePath: string): string {
   if (error.code === "unrecognized_keys") {
@@ -85,6 +89,7 @@ async function validateTeamFile(
       async (contributor, ctx) => {
         const avatarPath = path.resolve(
           path.dirname(filePath),
+          // @ts-expect-error This is fucked up because it's type of image in Astro
           contributor.avatar
         );
         try {
