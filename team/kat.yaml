@@ -1,6 +1,8 @@
 name: kat
 avatar: ./avatars/kat.jpg
-type: contractor
+type: 
+  - community
+  - contractor
 roles:
   FujoCoded:
   - HimeOps

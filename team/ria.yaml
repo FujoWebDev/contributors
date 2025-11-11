@@ -1,6 +1,8 @@
 name: ria
 avatar: "./avatars/riazaia.png"
-type: contractor
+type: 
+  - community
+  - contractor
 roles:
   Fandom Cookies:
     - role: Programming 

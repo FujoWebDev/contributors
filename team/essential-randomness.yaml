@@ -1,6 +1,7 @@
 name: Ms Boba
 alias: essential-randomness
-type: founder
+type: 
+  - founder
 avatar: "./avatars/essential-randomness.png"
 roles:
   Fandom Cookies:

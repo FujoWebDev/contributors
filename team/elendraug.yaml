@@ -1,6 +1,7 @@
 name: Elendraug
 avatar: "./avatars/elendraug.png"
-type: community
+type: 
+  - community
 roles:
   Fandom Cookies:
     - role: Extra 

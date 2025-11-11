@@ -1,6 +1,7 @@
 name: enigmalea
 avatar: "./avatars/enigmalea.png"
-type: community
+type: 
+  - community
 roles:
   Fandom Cookies:
     - Extra Hands (and Brains)

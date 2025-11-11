@@ -1,6 +1,7 @@
 name: yuu
 avatar: "./avatars/yuu.png"
-type: community
+type:
+  - community
 roles:
   Fandom Cookies:
     - Extra Hands (and Brains)

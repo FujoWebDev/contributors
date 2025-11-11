@@ -1,6 +1,8 @@
 name: Hyena
 avatar: "./avatars/hyena.png"
-type: community
+type: 
+  - community
+  - contractor
 roles:
   Fandom Cookies:
     - role: Artist

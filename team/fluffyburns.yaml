@@ -1,6 +1,7 @@
 name: Fluffyburns
 avatar: "./avatars/default.png"
-type: community
+type: 
+  - contractor
 roles:
   Fandom Cookies:
     - role: Artist
