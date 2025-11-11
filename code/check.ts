@@ -4,11 +4,12 @@ import path from "node:path";
 
 import { parse } from "yaml";
 
-import { TeamContributor } from "./schema.js";
+import { TeamContributor } from "../team/_schema";
 import z from "zod";
 
 const TEAM_DIR = path.resolve(process.cwd(), "team");
-const PROJECTS_FILE = path.resolve(process.cwd(), "code/data/projects.ts");
+const PROJECTS_FILE = path.resolve(process.cwd(), "team/_schema/projects.ts");
+const SCHEMA_FILE = path.resolve(process.cwd(), "team/_schema/index.ts");
 
 // Global abort controller to manage running validations
 let currentValidationController: AbortController | null = null;
@@ -251,9 +252,8 @@ function startWatchMode(): void {
   watchers.push(projectsWatcher);
 
   // Watch schema file
-  const schemaFile = path.resolve(process.cwd(), "code/schema.ts");
-  const schemaWatcher = watch(schemaFile, (eventType) => {
-    console.log(`${eventType}: ${schemaFile}`);
+  const schemaWatcher = watch(SCHEMA_FILE, (eventType) => {
+    console.log(`${eventType}: ${SCHEMA_FILE}`);
     runValidation();
   });
   watchers.push(schemaWatcher);

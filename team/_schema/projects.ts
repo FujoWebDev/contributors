@@ -8,8 +8,8 @@ export const PROJECTS = [
   "Volume 0 Issue 1",
   "Fandom Cookies",
   "FujoCoded",
-  "Test Project Name",
-];
+] as const;
+export type Project = typeof PROJECTS[number];
 
 export const VOLUME_0_ISSUE_1_ROLES = [
   "Technical Writer",
@@ -48,14 +48,10 @@ export const FANDOM_COOKIES_ROLES = [
   "Art Direction",
 ];
 
-export const TEST_PROJECTNAME_ROLES = [
-  "Role",
-  "Role",
-];
-
-export const PROJECT_ROLES = {
+export const PROJECT_ROLES : Record<Project, string[]> = {
   "Volume 0 Issue 1": VOLUME_0_ISSUE_1_ROLES,
-  "Test Project Name": TEST_PROJECTNAME_ROLES,
+  "Volume 0 Kickstarter": [],
+  "Volume 0": [],
   "Websites": WEBSITES_ROLES,
   "Fandom Cookies": FANDOM_COOKIES_ROLES,
   "FujoCoded": FUJOCODED_ROLES,

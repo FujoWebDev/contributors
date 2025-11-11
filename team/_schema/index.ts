@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PROJECT_ROLES, PROJECTS } from "./data/projects";
+import { PROJECT_ROLES, PROJECTS } from "./projects";
 import { access } from "node:fs/promises";
 import {
   SocialsSchema,
