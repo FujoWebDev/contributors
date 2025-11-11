@@ -4,12 +4,12 @@ import path from "node:path";
 
 import { parse } from "yaml";
 
-import { TeamContributor as TeamContributorFunction } from "../team/_schema";
+import { TeamContributor as TeamContributorFunction } from "../contributors/_schema";
 import z from "zod";
 
-const TEAM_DIR = path.resolve(process.cwd(), "team");
-const PROJECTS_FILE = path.resolve(process.cwd(), "team/_schema/projects.ts");
-const SCHEMA_FILE = path.resolve(process.cwd(), "team/_schema/index.ts");
+const TEAM_DIR = path.resolve(process.cwd(), "contributors");
+const PROJECTS_FILE = path.resolve(process.cwd(), "contributors/_schema/projects.ts");
+const SCHEMA_FILE = path.resolve(process.cwd(), "contributors/_schema/index.ts");
 
 // Global abort controller to manage running validations
 let currentValidationController: AbortController | null = null;
