@@ -38,7 +38,7 @@ const Roles = z
 const contributorType =  z.enum(
   ["founder", "contractor", "community"]).array().default(["community"]);
 
-export const TeamContributor = ({ image } : SchemaContext) => z.object({
+export const Contributor = ({ image } : SchemaContext) => z.object({
   name: z.string(),
   avatar: image(),
   type: contributorType,

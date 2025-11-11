@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { parse } from "yaml";
 
-import { TeamContributor as TeamContributorFunction } from "../contributors/_schema";
+import { Contributor as ContributorFunction } from "../contributors/_schema";
 import z from "zod";
 
 const TEAM_DIR = path.resolve(process.cwd(), "contributors");
@@ -43,7 +43,7 @@ class InvalidProjectError extends Error {
 }
 
 // @ts-expect-error This is fucked up because it's type of image in Astro
-const TeamContributor = TeamContributorFunction({ image: z.string})
+const Contributor = ContributorFunction({ image: z.string})
 
 function formatValidationError(error: any, filePath: string): string {
   if (error.code === "unrecognized_keys") {
@@ -85,7 +85,7 @@ async function validateTeamFile(
     const content = readFileSync(filePath, "utf-8");
     const data = parse(content);
 
-    const validation = await TeamContributor.superRefine(
+    const validation = await Contributor.superRefine(
       async (contributor, ctx) => {
         const avatarPath = path.resolve(
           path.dirname(filePath),
@@ -182,7 +182,7 @@ function printResults(results: ValidationResult[]): void {
       )}`
     );
     console.log(
-      `   • Ensure all required fields (${Object.entries(TeamContributor.shape)
+      `   • Ensure all required fields (${Object.entries(Contributor.shape)
         .filter(([_, field]) => !field.isOptional())
         .map(([fieldKey]) => fieldKey)
         .join(", ")}) are present`
