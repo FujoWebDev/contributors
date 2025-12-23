@@ -1,11 +1,28 @@
 import { readFileSync, readdirSync, watch } from "node:fs";
 import { access } from "node:fs/promises";
 import path from "node:path";
+import { type ContributorSchema as ContributorSchemaType } from "../contributors/_schema";
+import { createJiti } from "jiti";
 
 import { parse } from "yaml";
 
-import { ContributorSchema as ContributorFunction } from "../contributors/_schema";
 import z from "zod";
+
+const jiti = createJiti(import.meta.url);
+
+async function getContributor() {
+  // Clear schema cache to pick up changes
+  Object.keys(jiti.cache).forEach((key) => {
+    if (key.includes("_schema")) {
+      delete jiti.cache[key];
+    }
+  });
+  const { ContributorSchema } = (await jiti.import(
+    "../contributors/_schema"
+  )) as { ContributorSchema: typeof ContributorSchemaType };
+  // @ts-expect-error This is fucked up because it's type of image in Astro
+  return ContributorSchema({ image: z.string });
+}
 
 const TEAM_DIR = path.resolve(process.cwd(), "contributors");
 const PROJECTS_FILE = path.resolve(
@@ -47,9 +64,6 @@ class InvalidProjectError extends Error {
     );
   }
 }
-
-// @ts-expect-error This is fucked up because it's type of image in Astro
-const Contributor = ContributorFunction({ image: z.string });
 
 function formatValidationError(error: any, filePath: string): string {
   if (error.code === "unrecognized_keys") {
@@ -94,6 +108,7 @@ async function validateTeamFile(
 
     const content = readFileSync(filePath, "utf-8");
     const data = parse(content);
+    const Contributor = await getContributor();
 
     const validation = await Contributor.superRefine(
       async (contributor, ctx) => {
@@ -159,10 +174,10 @@ function validateAllTeamFiles(signal?: AbortSignal) {
   return results;
 }
 
-function printResults(
+async function printResults(
   results: ValidationResult[],
   isWatchMode: boolean = false
-): void {
+) {
   if (isWatchMode) {
     console.clear();
   }
@@ -189,6 +204,7 @@ function printResults(
   );
 
   if (hasErrors) {
+    const Contributor = await getContributor();
     console.log("\n💡 Tips:");
     console.log(
       `   • Project names and roles must match those in ./${path.relative(
@@ -226,7 +242,7 @@ async function runValidation(isWatchMode: boolean = false) {
     const results = await Promise.all(await validateAllTeamFiles(signal));
     const hasErrors = results.some((r) => !r.isValid);
 
-    printResults(await Promise.all(results));
+    await printResults(await Promise.all(results));
     if (isWatchMode) {
       console.log("Waiting for more changes...");
     }
@@ -247,7 +263,7 @@ function startWatchMode(): void {
   console.log("Time to watch 👀");
 
   // Run initial validation
-  runValidation();
+  runValidation(true);
 
   const watchers: Array<{ close: () => void }> = [];
 
@@ -255,28 +271,25 @@ function startWatchMode(): void {
     TEAM_DIR,
     { recursive: true },
     (eventType, filename) => {
-      console.log(`${eventType}: ${filename}`);
       if (
         filename &&
         (filename.endsWith(".yaml") || filename.endsWith(".yml"))
       ) {
-        runValidation();
+        runValidation(true);
       }
     }
   );
   watchers.push(teamWatcher);
 
   // Watch projects file
-  const projectsWatcher = watch(PROJECTS_FILE, (eventType) => {
-    console.log(`${eventType}: ${PROJECTS_FILE}`);
-    runValidation();
+  const projectsWatcher = watch(PROJECTS_FILE, () => {
+    runValidation(true);
   });
   watchers.push(projectsWatcher);
 
   // Watch schema file
-  const schemaWatcher = watch(SCHEMA_FILE, (eventType) => {
-    console.log(`${eventType}: ${SCHEMA_FILE}`);
-    runValidation();
+  const schemaWatcher = watch(SCHEMA_FILE, () => {
+    runValidation(true);
   });
   watchers.push(schemaWatcher);
 
