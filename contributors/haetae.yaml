@@ -4,7 +4,7 @@ type:
   - community
   - contractor
 roles:
-  Code Libraries:
+  Code Contributor:
     - role: Documentation
       details: Authproto README
 contacts:

@@ -281,19 +281,16 @@ function startWatchMode(): void {
   );
   watchers.push(teamWatcher);
 
-  // Watch projects file
   const projectsWatcher = watch(PROJECTS_FILE, () => {
     runValidation(true);
   });
   watchers.push(projectsWatcher);
 
-  // Watch schema file
   const schemaWatcher = watch(SCHEMA_FILE, () => {
     runValidation(true);
   });
   watchers.push(schemaWatcher);
 
-  // Handle graceful shutdown
   process.on("SIGINT", () => {
     console.log("\n👋 Bye bye!");
     watchers.forEach((watcher) => watcher.close());
@@ -301,7 +298,6 @@ function startWatchMode(): void {
   });
 }
 
-// Check if running in watch mode
 const isWatchMode =
   process.argv.includes("--watch") || process.argv.includes("-w");
 
@@ -312,6 +308,7 @@ if (isWatchMode) {
 
   process.exit(hasErrors ? 1 : 0);
 }
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
