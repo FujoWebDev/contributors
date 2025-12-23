@@ -8,8 +8,14 @@ import { ContributorSchema as ContributorFunction } from "../contributors/_schem
 import z from "zod";
 
 const TEAM_DIR = path.resolve(process.cwd(), "contributors");
-const PROJECTS_FILE = path.resolve(process.cwd(), "contributors/_schema/projects.ts");
-const SCHEMA_FILE = path.resolve(process.cwd(), "contributors/_schema/index.ts");
+const PROJECTS_FILE = path.resolve(
+  process.cwd(),
+  "contributors/_schema/projects.ts"
+);
+const SCHEMA_FILE = path.resolve(
+  process.cwd(),
+  "contributors/_schema/index.ts"
+);
 
 // Global abort controller to manage running validations
 let currentValidationController: AbortController | null = null;
@@ -21,9 +27,9 @@ interface ValidationResult {
 }
 
 class InvalidRoleError extends Error {
-  constructor(projectName: string, filePath: string) {
+  constructor(roleName: string, projectName: string, filePath: string) {
     super(
-      `Invalid role in project "${projectName}" for file ./${path.relative(
+      `Invalid role ${roleName} in project "${projectName}" for file ./${path.relative(
         process.cwd(),
         filePath
       )}.`
@@ -43,7 +49,7 @@ class InvalidProjectError extends Error {
 }
 
 // @ts-expect-error This is fucked up because it's type of image in Astro
-const Contributor = ContributorFunction({ image: z.string})
+const Contributor = ContributorFunction({ image: z.string });
 
 function formatValidationError(error: any, filePath: string): string {
   if (error.code === "unrecognized_keys") {
@@ -57,7 +63,11 @@ function formatValidationError(error: any, filePath: string): string {
     const path = error.path.join(".");
     if (path.includes("roles.")) {
       const projectName = path.split(".")[1];
-      throw new InvalidRoleError(projectName, filePath);
+      const roleName = error.unionErrors
+        // TODO: figure out zod typings
+        .flatMap((e: any) => e.issues)
+        .find((issue: any) => issue.code == "invalid_enum_value")?.received;
+      throw new InvalidRoleError(roleName, projectName, filePath);
     }
   }
 
@@ -149,8 +159,13 @@ function validateAllTeamFiles(signal?: AbortSignal) {
   return results;
 }
 
-function printResults(results: ValidationResult[]): void {
-  console.clear();
+function printResults(
+  results: ValidationResult[],
+  isWatchMode: boolean = false
+): void {
+  if (isWatchMode) {
+    console.clear();
+  }
   const hasErrors = results.some((r) => r.errors.length > 0);
 
   if (hasErrors) {
@@ -200,7 +215,9 @@ async function runValidation(isWatchMode: boolean = false) {
   const signal = currentValidationController.signal;
 
   try {
-    console.clear();
+    if (isWatchMode) {
+      console.clear();
+    }
     console.log("Running validation...");
 
     // Needs to wait or it's not clear anything is happening
