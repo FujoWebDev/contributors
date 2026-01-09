@@ -3,9 +3,10 @@ alias: passwordis0
 type: 
   - community
   - contractor
-avatar: "./avatars/essential-randomness.png"
+avatar: "./avatars/nate.jpg"
 roles:
   Fandom Cookies:
     - Project Management
 contacts:
+
   - https://github.com/passwordis0
