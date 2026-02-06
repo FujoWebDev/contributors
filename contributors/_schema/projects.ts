@@ -50,7 +50,7 @@ export const FANDOM_COOKIES_ROLES = [
 ];
 
 export const LEARN_AT_ROLES = ["Writers Coordinator", "Article Writer"];
-export const CODE_CONTRIBUTOR_ROLES = ["Documentation"];
+export const CODE_CONTRIBUTOR_ROLES = ["Documentation", "Maintainer"];
 
 export const PROJECT_ROLES: Record<Project, string[]> = {
   "Volume 0 Issue 1": VOLUME_0_ISSUE_1_ROLES,
