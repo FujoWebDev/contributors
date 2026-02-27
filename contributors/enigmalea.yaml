@@ -1,8 +1,29 @@
 name: enigmalea
 avatar: "./avatars/enigmalea.png"
-type: 
+type:
   - community
 roles:
+  Volume 0 Kickstarter:
+    - Project Organizing
+    - Technical Writer
+    - Editor
+    - QA Testing
+  Volume 0:
+    - Project Organizing
+    - Technical Writer
+    - Editor
+    - Beta Wrangler
+  Volume 0 Issue 1:
+    - Technical Writer
+    - Beta Reading Coordinator
+    - Additional Coding
+  Websites:
+    - role: fujoweb.dev
+      details: Maintainer
+    - role: fujoweb.dev
+      details: Coder
+    - role: fujoweb.dev
+      details: Copy Writer
   Fandom Cookies:
     - Extra Hands (and Brains)
 contacts:
