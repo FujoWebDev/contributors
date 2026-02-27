@@ -1,6 +1,8 @@
 name: brokemycrown
 avatar: ./avatars/brokemycrown.jpg
-type: community
+type:
+  - community
+  - contractor
 roles:
   Volume 0 Kickstarter:
     - Art Director
