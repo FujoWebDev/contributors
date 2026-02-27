@@ -21,11 +21,15 @@ export const VOLUME_0_ROLES = [
   "Additional Coding",
   "Artist",
   "Beta Reader",
+  "Beta Reading Coordinator",
   "Beta Wrangler",
   "Character Designer",
   "Editor",
+  "Project Lead",
   "Project Organizing",
   "Technical Writer",
+  "The One Who Talks With The Lawyers",
+  "Writer",
 ];
 
 export const VOLUME_0_ISSUE_1_ROLES = [
