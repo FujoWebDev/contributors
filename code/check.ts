@@ -25,9 +25,9 @@ async function getContributor() {
 }
 
 const TEAM_DIR = path.resolve(process.cwd(), "contributors");
-const PROJECTS_FILE = path.resolve(
+const PROJECTS_DIR = path.resolve(
   process.cwd(),
-  "contributors/_schema/projects.ts"
+  "contributors/_schema/projects"
 );
 const SCHEMA_FILE = path.resolve(
   process.cwd(),
@@ -209,8 +209,8 @@ async function printResults(
     console.log(
       `   • Project names and roles must match those in ./${path.relative(
         process.cwd(),
-        PROJECTS_FILE
-      )}`
+        PROJECTS_DIR
+      )}/`
     );
     console.log(
       `   • Ensure all required fields (${Object.entries(Contributor.shape)
@@ -281,9 +281,15 @@ function startWatchMode(): void {
   );
   watchers.push(teamWatcher);
 
-  const projectsWatcher = watch(PROJECTS_FILE, () => {
-    runValidation(true);
-  });
+  const projectsWatcher = watch(
+    PROJECTS_DIR,
+    { recursive: true },
+    (eventType, filename) => {
+      if (filename && filename.endsWith(".ts")) {
+        runValidation(true);
+      }
+    }
+  );
   watchers.push(projectsWatcher);
 
   const schemaWatcher = watch(SCHEMA_FILE, () => {
