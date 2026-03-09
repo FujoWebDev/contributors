@@ -6,5 +6,8 @@ roles:
   Code Contributor:
     - role: Documentation
       details: AuthProto README
+  Learn@:
+    - role: Article Writer
+      details: GitHub Codespaces
     - role: Maintainer
       details: ao3.js, fujocoded-plugins, astrolabe
