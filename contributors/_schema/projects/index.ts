@@ -16,7 +16,7 @@ export {
 
 export { FANDOM_COOKIES_ROLES } from "./fandom-cookies";
 
-export const FUJOCODED_ROLES = ["HimeOps", "FujoCoded"];
+export const FUJOCODED_ROLES = ["HimeOps", "FujoCoded", "Project Manager"];
 export const LEARN_AT_ROLES = ["Article Writer", "Writers Coordinator"];
 export const CODE_CONTRIBUTOR_ROLES = ["Documentation", "Maintainer"];
 
